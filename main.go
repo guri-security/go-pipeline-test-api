@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/guri-security/go-pipline-test-api/routes"
+)
 
 func main() {
-	fmt.Println("Rodou")
+	routes.Load()
+	http.ListenAndServe(":8888", nil)
 }
