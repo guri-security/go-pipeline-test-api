@@ -11,8 +11,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+      tag: ${{ steps.build.outputs.tag }}
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag go-pipeline-test-api:$(date +%s)
+    
+    - name: Archive tar file
+      uses: actions/upload-artifact@v3
+      with:
+        name: go-pipeline-test-api-tar-file
+        path: go-pipeline-test-api.tar
