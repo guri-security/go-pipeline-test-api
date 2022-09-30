@@ -20,6 +20,7 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build . --file Dockerfile --tag go-pipeline-test-api:$(date +%s)
+        echo "::set-output name=image::go-pipeline-test-api:$(date +%s)"
         docker save -o go-pipeline-test-api.tar go-pipeline-test-api:$(date +%s)
 
     - name: Archive tar file
