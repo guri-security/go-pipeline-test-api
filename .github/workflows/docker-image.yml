@@ -10,7 +10,7 @@ jobs:
 
   build:
 
-    runs-on: medium-runner
+    runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.build.outputs.image }}
       tag: ${{ steps.build.outputs.tag }}
@@ -30,7 +30,7 @@ jobs:
 
   security_check:
     needs: build
-    runs-on: medium-runner
+    runs-on: ubuntu-latest
     steps:
       - name: Download go-pipeline-test-api archive
         uses: actions/download-artifact@v3
@@ -47,3 +47,21 @@ jobs:
           sudo apt-get install trivy
       - name: Scan the local image with trivy
         run: trivy image --input pagarme-go-pipeline-test-api.tar
+
+  dast_check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download go-pipeline-test-api archive
+        uses: actions/download-artifact@v3
+        with:
+          name: go-pipeline-test-api-tar-file
+        
+      - name: run application
+        run: |
+          docker load --input go-pipeline-test-api.tar
+          docker run -d -p 8888:8888 --name go-pipeline-test-api go-pipeline-test-api:latest
+
+      - name: curl api
+        run |
+          curl localhost:8888
