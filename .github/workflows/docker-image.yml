@@ -10,7 +10,7 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: medium-runner
     outputs:
       image: ${{ steps.build.outputs.image }}
       tag: ${{ steps.build.outputs.tag }}
@@ -27,3 +27,23 @@ jobs:
       with:
         name: go-pipeline-test-api-tar-file
         path: go-pipeline-test-api.tar
+
+  security_check:
+    needs: build
+    runs-on: medium-runner
+    steps:
+      - name: Download go-pipeline-test-api archive
+        uses: actions/download-artifact@v3
+        with:
+          name: go-pipeline-test-api-tar-file
+
+      - name: Install trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+      - name: Scan the local image with trivy
+        run: trivy image --input pagarme-go-pipeline-test-api.tar
