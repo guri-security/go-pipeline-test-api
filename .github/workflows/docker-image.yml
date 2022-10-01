@@ -19,9 +19,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag go-pipeline-test-api:$(date +%s)
-        echo "::set-output name=image::go-pipeline-test-api:$(date +%s)"
-        docker save -o go-pipeline-test-api.tar go-pipeline-test-api:$(date +%s)
+        docker build . --file Dockerfile --tag go-pipeline-test-api:latest
+        docker save -o go-pipeline-test-api.tar go-pipeline-test-api:latest
 
     - name: Archive tar file
       uses: actions/upload-artifact@v3
