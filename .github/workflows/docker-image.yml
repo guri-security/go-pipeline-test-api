@@ -63,5 +63,5 @@ jobs:
           docker run -d -p 8888:8888 --name go-pipeline-test-api go-pipeline-test-api:latest
 
       - name: curl api
-        run |
+        run: |
           curl localhost:8888
