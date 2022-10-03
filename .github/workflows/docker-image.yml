@@ -28,7 +28,7 @@ jobs:
         name: go-pipeline-test-api-tar-file
         path: go-pipeline-test-api.tar
 
-  security_check:
+  image-security-check:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -46,22 +46,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install trivy
       - name: Scan the local image with trivy
-        run: trivy image --input pagarme-go-pipeline-test-api.tar
-
-  dast_check:
-    needs: build
+        run: trivy image --input go-pipeline-test-api.tar
+  
+  sast:
     runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
     steps:
-      - name: Download go-pipeline-test-api archive
-        uses: actions/download-artifact@v3
+      - name: Checkout Source
+        uses: actions/checkout@v2
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
         with:
-          name: go-pipeline-test-api-tar-file
-        
-      - name: run application
-        run: |
-          docker load --input go-pipeline-test-api.tar
-          docker run -d -p 8888:8888 --name go-pipeline-test-api go-pipeline-test-api:latest
-
-      - name: curl api
-        run: |
-          curl localhost:8888
+          args: ./...
