@@ -1,3 +1,5 @@
-module github.com/guri-security/go-pipline-test-api
+module github.com/guri-security/go-pipeline-test-api
 
 go 1.18
+
+require github.com/gorilla/mux v1.8.0

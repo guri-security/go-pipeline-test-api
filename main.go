@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/guri-security/go-pipline-test-api/routes"
+	"github.com/guri-security/go-pipeline-test-api/routes"
 )
 
 func main() {
-	routes.Load()
 
 	server := &http.Server{
 		Addr:              ":8888",
 		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           routes.Load(),
 	}
 
 	err := server.ListenAndServe()
