@@ -7,6 +7,8 @@ import (
 	"github.com/guri-security/go-pipeline-test-api/routes"
 )
 
+var password = "senha_teste_sast_123"
+
 func main() {
 
 	server := &http.Server{
