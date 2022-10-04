@@ -1,0 +1,61 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+      tag: ${{ steps.build.outputs.tag }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: |
+        docker build . --file Dockerfile --tag go-pipeline-test-api:latest
+        docker save -o go-pipeline-test-api.tar go-pipeline-test-api:latest
+
+    - name: Archive tar file
+      uses: actions/upload-artifact@v3
+      with:
+        name: go-pipeline-test-api-tar-file
+        path: go-pipeline-test-api.tar
+
+  image-security-check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download go-pipeline-test-api archive
+        uses: actions/download-artifact@v3
+        with:
+          name: go-pipeline-test-api-tar-file
+
+      - name: Install trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+      - name: Scan the local image with trivy
+        run: trivy image --input go-pipeline-test-api.tar
+  
+  sast:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...
