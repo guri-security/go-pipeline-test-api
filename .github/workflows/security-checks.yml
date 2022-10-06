@@ -54,8 +54,19 @@ jobs:
       GO111MODULE: on
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
           args: ./...
+
+  dast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+      - name: Run Application
+        run: |
+          go build .
+          ./go-pipeline-test-api
+          curl http://localhost:8888/api
