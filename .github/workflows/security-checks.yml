@@ -68,3 +68,4 @@ jobs:
       - name: Run Application
         run: |
           go build .
+          ./go-pipeline-test-api
