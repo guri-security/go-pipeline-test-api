@@ -69,4 +69,10 @@ jobs:
         run: |
           go build .
           ./go-pipeline-test-api &
-          curl http://localhost:8888/api
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          docker_name: 'owasp/zap2docker-stable'
+          target: 'http://localhost:8888/'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a'
