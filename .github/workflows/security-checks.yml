@@ -68,5 +68,3 @@ jobs:
       - name: Run Application
         run: |
           go build .
-          ./go-pipeline-test-api
-          curl http://localhost:8888/api
